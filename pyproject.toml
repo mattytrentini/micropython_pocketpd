@@ -7,7 +7,7 @@ requires-python = ">=3.11"
 [tool.ruff]
 line-length = 99
 target-version = "py311"
-exclude = ["lib/"]
+exclude = ["lib/", "fonts/large.py", "fonts/medium.py", "fonts/small.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
@@ -20,6 +20,10 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["drivers", "app", "config"]
+
+[tool.ty.rules]
+# MicroPython built-ins (framebuf, uctypes) won't resolve on CPython
+unresolved-import = "warn"
 
 [tool.ty.environment]
 python-version = "3.11"
