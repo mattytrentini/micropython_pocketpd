@@ -4,10 +4,7 @@ Six states: BOOT → OBTAIN → CAPDISPLAY → NORMAL_PPS/NORMAL_PDO, plus MENU.
 Designed to run as cooperative async tasks.
 """
 
-try:
-    import uasyncio as asyncio
-except ImportError:
-    import asyncio
+import asyncio
 
 import config
 

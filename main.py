@@ -1,9 +1,6 @@
 """PocketPD main — wire up drivers and run the state machine."""
 
-try:
-    import uasyncio as asyncio
-except ImportError:
-    import asyncio
+import asyncio
 
 import machine
 
