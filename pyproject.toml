@@ -1,0 +1,25 @@
+[project]
+name = "micropython-pocketpd"
+version = "0.1.0"
+description = "MicroPython port of the PocketPD USB-C PD bench power supply firmware"
+requires-python = ">=3.11"
+
+[tool.ruff]
+line-length = 99
+target-version = "py311"
+exclude = ["lib/"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E402",  # module level import not at top (needed for mock_machine bootstrap)
+    "F401",  # unused imports in __init__.py
+    "UP031",  # % format — MicroPython doesn't support complex f-string expressions
+    "SIM115",  # context manager for open — not always practical in MicroPython
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["drivers", "app", "config"]
+
+[tool.ty.environment]
+python-version = "3.11"

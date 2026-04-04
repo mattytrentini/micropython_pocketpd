@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.mpy
+*.egg-info/
+dist/
+build/
+
+# MicroPython
+.micropython/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Research context (local only)
+context/

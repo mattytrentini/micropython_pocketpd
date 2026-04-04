@@ -1,0 +1,3 @@
+[submodule "lib/mock_machine"]
+	path = lib/mock_machine
+	url = https://github.com/planetinnovation/micropython-mock-machine.git
