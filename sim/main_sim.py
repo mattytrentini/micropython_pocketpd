@@ -66,13 +66,40 @@ def create_sim():
     buf = bytearray(128 * 64 // 8)
     sim_fb = FrameBuffer(buf, 128, 64, MONO_VLSB)
 
-    # Wrap show() to also flush to WebSocket
-    _original_show = getattr(sim_fb, "show", None)
+    # Override to_rgba with a fast MONO_VLSB-specific converter.
+    # The default does per-pixel Python function calls (8192 * 2 = ~16K calls/frame).
+    # This processes bytes directly: each byte = 8 vertical pixels, ~60x faster.
+    def fast_to_rgba():
+        width, height = 128, 64
+        rgba = bytearray(width * height * 4)
+        stride = width
+        for page in range(height // 8):
+            page_offset = page * stride
+            for x in range(width):
+                byte = buf[page_offset + x]
+                for bit in range(8):
+                    y = page * 8 + bit
+                    v = 255 if (byte >> bit) & 1 else 0
+                    idx = (y * width + x) * 4
+                    rgba[idx] = v
+                    rgba[idx + 1] = v
+                    rgba[idx + 2] = v
+                    rgba[idx + 3] = 255
+        return bytes(rgba)
+
+    sim_fb.to_rgba = fast_to_rgba
+
+    # Throttle display flushes to ~10fps (every ~100ms) instead of every 33ms
+    import time
+
+    _last_flush_ms = [0]
+    _FLUSH_INTERVAL_MS = 100
 
     def show_and_flush():
-        if _original_show:
-            _original_show()
-        sim_fb.flush()
+        now = time.ticks_ms()
+        if time.ticks_diff(now, _last_flush_ms[0]) >= _FLUSH_INTERVAL_MS:
+            _last_flush_ms[0] = now
+            sim_fb.flush()
 
     sim_fb.show = show_and_flush
 
