@@ -11,7 +11,8 @@ import sys
 
 import mip  # Install logging from micropython-lib (needed by mock_machine, idempotent)
 
-mip.install("logging")
+mip.install("logging", target="/tmp/mip_lib")
+sys.path.insert(0, "/tmp/mip_lib")
 
 # Add project root and lib to path
 sys.path.insert(0, "/code")

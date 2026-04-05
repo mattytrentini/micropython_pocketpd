@@ -1,3 +1,6 @@
 [submodule "lib/mock_machine"]
 	path = lib/mock_machine
 	url = https://github.com/planetinnovation/micropython-mock-machine.git
+[submodule "lib/framebuf_canvas"]
+	path = lib/framebuf_canvas
+	url = /home/matt/code/framebuf_canvas
