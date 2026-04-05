@@ -22,3 +22,7 @@ check: lint typecheck test
 # Format check (no modification)
 format-check:
     ruff format --check .
+
+# Run PocketPD simulation with browser UI
+sim:
+    docker run --rm -p 8080:8080 -v $(pwd):/code -w /code micropython/unix micropython sim/main_sim.py
