@@ -2,7 +2,7 @@
 
 A MicroPython port of the [PocketPD](https://github.com/CentyLab/PocketPD) USB-C Power Delivery bench power supply firmware, with a browser-based simulator for development without hardware.
 
-![PocketPD on Crowd Supply](https://www.crowdsupply.com/img/5ed2/pocketpd-quarter-top-01_jpg_open-graph.jpg)
+![PocketPD Simulator](docs/simulator_screenshot.png)
 
 ## What is PocketPD?
 
