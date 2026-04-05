@@ -14,7 +14,7 @@ format:
 
 # Run ty type checker (exclude lib/ and tests/ — MicroPython-only imports)
 typecheck:
-    ty check --exclude 'lib/' --exclude 'tests/'
+    ty check --exclude 'lib/' --exclude 'tests/' --exclude 'boot.py' --exclude 'main.py'
 
 # Run all checks (format check + lint + typecheck + tests)
 check: lint typecheck test
