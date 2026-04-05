@@ -143,7 +143,7 @@ def setup_routes(app, sm, sim_ina=None):
 
     # --- WebSocket status broadcast ---
 
-    @app.route("/ws/status")
+    @app.route("/ws-status")
     @with_websocket
     async def ws_status(request, ws):
         status_clients.add(ws)

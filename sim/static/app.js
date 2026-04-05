@@ -64,7 +64,7 @@ function renderFrame(data) {
 let statusWs = null;
 
 function connectStatusWs() {
-    const url = `ws://${location.host}/ws/status`;
+    const url = `ws://${location.host}/ws-status`;
     statusWs = new WebSocket(url);
 
     statusWs.onopen = () => {
