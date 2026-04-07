@@ -1,0 +1,61 @@
+@startuml PocketPD State Machine
+
+skinparam backgroundColor #1a1a2e
+skinparam state {
+    BackgroundColor #16213e
+    BorderColor #00d4ff
+    FontColor #e0e0e0
+    ArrowColor #888888
+}
+skinparam note {
+    BackgroundColor #0a0a1a
+    BorderColor #444444
+    FontColor #aaaaaa
+}
+
+title PocketPD State Machine
+
+state BOOT : Show splash screen\n(500ms)
+state OBTAIN : Read PDOs from\nUSB PD charger
+state CAPDISPLAY : Show available\npower profiles\n(3s timeout)
+
+state "Normal Operation" as normal {
+    state NORMAL_PPS : PPS mode\nFine V/I control\n(20mV / 50mA steps)
+    state NORMAL_PDO : Fixed PDO mode\nPre-set voltage profiles
+
+    state choice <<choice>>
+    choice --> NORMAL_PPS : has PPS
+    choice --> NORMAL_PDO : fixed only
+}
+
+state MENU : Profile selection\nEncoder navigates\nlist
+
+[*] --> BOOT
+
+BOOT --> OBTAIN : 500ms elapsed
+
+OBTAIN --> CAPDISPLAY : PDOs parsed
+
+CAPDISPLAY --> choice : 3s timeout\nor any button
+
+CAPDISPLAY --> choice : any button press
+
+NORMAL_PPS --> MENU : encoder\nlong press
+NORMAL_PDO --> MENU : encoder\nlong press
+
+MENU --> choice : select\nlong press\n(apply profile)
+
+note right of NORMAL_PPS
+  **Encoder rotation**: adjust target V or I
+  **Encoder short**: cycle step scale
+  **Select short**: toggle V/I adjust
+  **Output short**: toggle output on/off
+  **Output long**: toggle energy display
+end note
+
+note left of MENU
+  **Encoder rotation**: navigate profiles
+  **Select long**: confirm & return
+end note
+
+@enduml
