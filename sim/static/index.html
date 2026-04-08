@@ -237,16 +237,16 @@
 
             <h2>Buttons</h2>
             <div class="btn-group">
-                <button class="btn" onclick="apiPost('/api/button/output', {event: 'short'})">Out Short</button>
-                <button class="btn" onclick="apiPost('/api/button/output', {event: 'long'})">Out Long</button>
+                <button class="btn" onclick="apiPost('/api/button/output', {event: 'short'})" title="Toggle output on/off">Out: Toggle</button>
+                <button class="btn" onclick="apiPost('/api/button/output', {event: 'long'})" title="Switch between normal and energy display">Out: Energy</button>
             </div>
             <div class="btn-group">
-                <button class="btn" onclick="apiPost('/api/button/select', {event: 'short'})">Sel Short</button>
-                <button class="btn" onclick="apiPost('/api/button/select', {event: 'long'})">Sel Long</button>
+                <button class="btn" onclick="apiPost('/api/button/select', {event: 'short'})" title="Switch between voltage and current adjustment">Sel: V/I</button>
+                <button class="btn" onclick="apiPost('/api/button/select', {event: 'long'})" title="Confirm menu selection">Sel: Confirm</button>
             </div>
             <div class="btn-group">
-                <button class="btn" onclick="apiPost('/api/button/encoder', {event: 'short'})">Enc Short</button>
-                <button class="btn" onclick="apiPost('/api/button/encoder', {event: 'long'})">Enc Long</button>
+                <button class="btn" onclick="apiPost('/api/button/encoder', {event: 'short'})" title="Cycle step size (20/100/1000)">Enc: Scale</button>
+                <button class="btn" onclick="apiPost('/api/button/encoder', {event: 'long'})" title="Enter/exit profile menu">Enc: Menu</button>
             </div>
         </div>
 
