@@ -117,39 +117,17 @@
             background: #16213e;
             border-radius: 8px;
             padding: 16px;
-            min-width: 220px;
+            min-width: 260px;
+            max-width: 340px;
         }
-        .state-panel svg { display: block; margin: 0 auto; }
-        .sm-node rect {
-            fill: #0a0a1a;
-            stroke: #444;
-            stroke-width: 1.5;
-            rx: 6;
-            transition: fill 0.3s, stroke 0.3s, filter 0.3s;
-        }
-        .sm-node text {
-            fill: #888;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
-            font-size: 11px;
-            text-anchor: middle;
-            transition: fill 0.3s;
-        }
-        .sm-node text.sm-label {
-            font-size: 9px;
-            fill: #555;
-        }
-        .sm-node.active rect {
-            fill: #0d2847;
-            stroke: #00d4ff;
-            stroke-width: 2;
+        .state-panel svg { max-width: 100%; height: auto; }
+        /* Mermaid active state highlighting */
+        .sm-active > .label-container {
+            stroke: #00d4ff !important;
+            stroke-width: 2px !important;
             filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.5));
         }
-        .sm-node.active text { fill: #00d4ff; }
-        .sm-node.active text.sm-label { fill: #00a0cc; }
-        .sm-arrow { stroke: #444; stroke-width: 1.2; fill: none; marker-end: url(#sm-arrowhead); }
-        .sm-arrow.active { stroke: #00d4ff; filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.4)); }
-        .sm-diamond { fill: #0a0a1a; stroke: #444; stroke-width: 1.5; }
-        .sm-choice-label { fill: #555; font-family: monospace; font-size: 8px; }
+        .sm-active .nodeLabel { color: #00d4ff !important; }
     </style>
 </head>
 <body>
@@ -253,111 +231,42 @@
         <!-- State Machine Diagram -->
         <div class="state-panel">
             <h2>State Machine</h2>
-            <svg id="sm-diagram" width="240" height="520" viewBox="0 0 240 520">
-                <defs>
-                    <marker id="sm-arrowhead" markerWidth="8" markerHeight="6"
-                            refX="8" refY="3" orient="auto">
-                        <polygon points="0 0, 8 3, 0 6" fill="#444"/>
-                    </marker>
-                    <marker id="sm-arrowhead-active" markerWidth="8" markerHeight="6"
-                            refX="8" refY="3" orient="auto">
-                        <polygon points="0 0, 8 3, 0 6" fill="#00d4ff"/>
-                    </marker>
-                </defs>
-
-                <!-- BOOT -->
-                <g id="sm-state-0" class="sm-node">
-                    <rect x="70" y="10" width="100" height="40"/>
-                    <text x="120" y="27">BOOT</text>
-                    <text x="120" y="41" class="sm-label">splash 500ms</text>
-                </g>
-                <line id="sm-arrow-0-1" class="sm-arrow" x1="120" y1="50" x2="120" y2="70"/>
-
-                <!-- OBTAIN -->
-                <g id="sm-state-1" class="sm-node">
-                    <rect x="70" y="70" width="100" height="40"/>
-                    <text x="120" y="87">OBTAIN</text>
-                    <text x="120" y="101" class="sm-label">read PDOs</text>
-                </g>
-                <line id="sm-arrow-1-2" class="sm-arrow" x1="120" y1="110" x2="120" y2="130"/>
-
-                <!-- CAPDISPLAY -->
-                <g id="sm-state-2" class="sm-node">
-                    <rect x="60" y="130" width="120" height="40"/>
-                    <text x="120" y="147">CAPDISPLAY</text>
-                    <text x="120" y="161" class="sm-label">show profiles 3s</text>
-                </g>
-                <line id="sm-arrow-2-c" class="sm-arrow" x1="120" y1="170" x2="120" y2="195"/>
-
-                <!-- Choice diamond -->
-                <polygon class="sm-diamond" points="120,195 135,210 120,225 105,210"/>
-
-                <!-- Choice to NORMAL_PPS -->
-                <line id="sm-arrow-c-3" class="sm-arrow" x1="105" y1="210" x2="60" y2="245"/>
-                <text class="sm-choice-label" x="50" y="225">PPS</text>
-
-                <!-- Choice to NORMAL_PDO -->
-                <line id="sm-arrow-c-4" class="sm-arrow" x1="135" y1="210" x2="180" y2="245"/>
-                <text class="sm-choice-label" x="163" y="225">fixed</text>
-
-                <!-- NORMAL_PPS -->
-                <g id="sm-state-3" class="sm-node">
-                    <rect x="5" y="245" width="110" height="40"/>
-                    <text x="60" y="262">NORMAL_PPS</text>
-                    <text x="60" y="276" class="sm-label">fine V/I ctrl</text>
-                </g>
-
-                <!-- NORMAL_PDO -->
-                <g id="sm-state-4" class="sm-node">
-                    <rect x="125" y="245" width="110" height="40"/>
-                    <text x="180" y="262">NORMAL_PDO</text>
-                    <text x="180" y="276" class="sm-label">fixed profiles</text>
-                </g>
-
-                <!-- NORMAL_PPS <-> ENERGY_PPS (bidirectional) -->
-                <line id="sm-arrow-3-e3" class="sm-arrow" x1="45" y1="285" x2="45" y2="335"/>
-                <line id="sm-arrow-e3-3" class="sm-arrow" x1="75" y1="335" x2="75" y2="285"/>
-                <text class="sm-choice-label" x="10" y="314">out long</text>
-
-                <!-- NORMAL_PDO <-> ENERGY_PDO (bidirectional) -->
-                <line id="sm-arrow-4-e4" class="sm-arrow" x1="165" y1="285" x2="165" y2="335"/>
-                <line id="sm-arrow-e4-4" class="sm-arrow" x1="195" y1="335" x2="195" y2="285"/>
-                <text class="sm-choice-label" x="200" y="314">out long</text>
-
-                <!-- ENERGY_PPS -->
-                <g id="sm-state-e3" class="sm-node">
-                    <rect x="5" y="335" width="110" height="40"/>
-                    <text x="60" y="352">ENERGY_PPS</text>
-                    <text x="60" y="366" class="sm-label">V A W Wh Ah</text>
-                </g>
-
-                <!-- ENERGY_PDO -->
-                <g id="sm-state-e4" class="sm-node">
-                    <rect x="125" y="335" width="110" height="40"/>
-                    <text x="180" y="352">ENERGY_PDO</text>
-                    <text x="180" y="366" class="sm-label">V A W Wh Ah</text>
-                </g>
-
-                <!-- Normal/Energy to MENU -->
-                <line id="sm-arrow-3-5" class="sm-arrow" x1="60" y1="375" x2="95" y2="425"/>
-                <line id="sm-arrow-4-5" class="sm-arrow" x1="180" y1="375" x2="145" y2="425"/>
-                <text class="sm-choice-label" x="38" y="408">enc long</text>
-                <text class="sm-choice-label" x="155" y="408">enc long</text>
-
-                <!-- MENU -->
-                <g id="sm-state-5" class="sm-node">
-                    <rect x="70" y="425" width="100" height="40"/>
-                    <text x="120" y="442">MENU</text>
-                    <text x="120" y="456" class="sm-label">select profile</text>
-                </g>
-
-                <!-- MENU back to choice (curved path up the side) -->
-                <path id="sm-arrow-5-c" class="sm-arrow" d="M 70,445 L 18,445 L 18,210 L 105,210" fill="none"/>
-                <text class="sm-choice-label" x="3" y="330">sel long</text>
-            </svg>
+            <pre id="sm-diagram" class="mermaid">
+stateDiagram-v2
+    [*] --> BOOT
+    BOOT --> OBTAIN : 500ms
+    OBTAIN --> CAPDISPLAY : PDOs parsed
+    CAPDISPLAY --> NORMAL_PPS : has PPS
+    CAPDISPLAY --> NORMAL_PDO : fixed only
+    NORMAL_PPS --> ENERGY_PPS : out long
+    ENERGY_PPS --> NORMAL_PPS : out long
+    NORMAL_PDO --> ENERGY_PDO : out long
+    ENERGY_PDO --> NORMAL_PDO : out long
+    NORMAL_PPS --> MENU : enc long
+    NORMAL_PDO --> MENU : enc long
+    ENERGY_PPS --> MENU : enc long
+    ENERGY_PDO --> MENU : enc long
+    MENU --> NORMAL_PPS : sel long (PPS)
+    MENU --> NORMAL_PDO : sel long (fixed)
+            </pre>
         </div>
     </div>
 
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                darkMode: true,
+                primaryColor: '#16213e',
+                primaryBorderColor: '#444',
+                primaryTextColor: '#e0e0e0',
+                lineColor: '#888',
+                background: '#16213e',
+            }
+        });
+    </script>
     <script src="/static/app.js"></script>
 </body>
 </html>

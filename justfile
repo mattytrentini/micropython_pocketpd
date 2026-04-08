@@ -26,3 +26,7 @@ format-check:
 # Run PocketPD simulation with browser UI
 sim:
     docker run --rm -p 8080:8080 -v $(pwd):/code -w /code micropython/unix micropython sim/main_sim.py
+
+# Generate state machine PNG from Mermaid definition
+diagram:
+    docker run --rm -u "$(id -u):$(id -g)" -v $(pwd)/docs:/data minlag/mermaid-cli -i state_machine.mmd -o state_machine.png -t dark -b '#1a1a2e'

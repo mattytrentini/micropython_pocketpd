@@ -9,6 +9,8 @@ MicroPython port of the [PocketPD](https://github.com/CentyLab/PocketPD) USB-C P
 - `just format` — ruff formatter
 - `just typecheck` — ty type checker
 - `just check` — all checks (lint + typecheck + test)
+- `just sim` — run web simulator (Docker, port 8080)
+- `just diagram` — regenerate state machine PNG from Mermaid
 
 ## Architecture
 

@@ -1,0 +1,46 @@
+---
+title: PocketPD State Machine
+---
+stateDiagram-v2
+    [*] --> BOOT
+
+    BOOT : Show splash screen (500ms)
+    OBTAIN : Read PDOs from USB PD charger
+    CAPDISPLAY : Show power profiles (3s)
+    NORMAL_PPS : PPS mode — fine V/I control
+    NORMAL_PDO : Fixed PDO mode
+    ENERGY_PPS : PPS energy display (V A W Wh Ah)
+    ENERGY_PDO : PDO energy display (V A W Wh Ah)
+    MENU : Profile selection
+
+    BOOT --> OBTAIN : 500ms elapsed
+    OBTAIN --> CAPDISPLAY : PDOs parsed
+
+    CAPDISPLAY --> NORMAL_PPS : has PPS
+    CAPDISPLAY --> NORMAL_PDO : fixed only
+
+    NORMAL_PPS --> ENERGY_PPS : out long
+    ENERGY_PPS --> NORMAL_PPS : out long
+    NORMAL_PDO --> ENERGY_PDO : out long
+    ENERGY_PDO --> NORMAL_PDO : out long
+
+    NORMAL_PPS --> MENU : enc long
+    NORMAL_PDO --> MENU : enc long
+    ENERGY_PPS --> MENU : enc long
+    ENERGY_PDO --> MENU : enc long
+
+    MENU --> NORMAL_PPS : sel long (has PPS)
+    MENU --> NORMAL_PDO : sel long (fixed only)
+
+    note right of NORMAL_PPS
+        Encoder rotation: adjust target V or I
+        Encoder short: cycle step scale
+        Select short: toggle V/I adjust
+        Output short: toggle output on/off
+        Output long: toggle energy display
+    end note
+
+    note right of MENU
+        Encoder rotation: navigate profiles
+        Select long: confirm & return
+    end note

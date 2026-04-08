@@ -79,10 +79,23 @@ The firmware is a **6-state async state machine** with three cooperative tasks:
 
 ### State Flow
 
-```
-BOOT → OBTAIN → CAPDISPLAY → NORMAL_PPS or NORMAL_PDO
-                                    ↕
-                                  MENU
+```mermaid
+stateDiagram-v2
+    [*] --> BOOT
+    BOOT --> OBTAIN : 500ms
+    OBTAIN --> CAPDISPLAY : PDOs parsed
+    CAPDISPLAY --> NORMAL_PPS : has PPS
+    CAPDISPLAY --> NORMAL_PDO : fixed only
+    NORMAL_PPS --> ENERGY_PPS : out long
+    ENERGY_PPS --> NORMAL_PPS : out long
+    NORMAL_PDO --> ENERGY_PDO : out long
+    ENERGY_PDO --> NORMAL_PDO : out long
+    NORMAL_PPS --> MENU : enc long
+    NORMAL_PDO --> MENU : enc long
+    ENERGY_PPS --> MENU : enc long
+    ENERGY_PDO --> MENU : enc long
+    MENU --> NORMAL_PPS : sel long (PPS)
+    MENU --> NORMAL_PDO : sel long (fixed)
 ```
 
 ## Project Structure

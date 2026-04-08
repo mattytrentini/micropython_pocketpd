@@ -86,57 +86,45 @@ function connectStatusWs() {
     };
 }
 
-// --- State Machine Diagram ---
+// --- State Machine Diagram (Mermaid) ---
 
-// All node IDs that can be highlighted
-const SM_ALL_NODES = ['sm-state-0', 'sm-state-1', 'sm-state-2', 'sm-state-3',
-    'sm-state-4', 'sm-state-5', 'sm-state-e3', 'sm-state-e4'];
-
-// Which arrows to light for each effective state key
-const SM_ARROWS = {
-    '0':  [],
-    '1':  ['sm-arrow-0-1'],
-    '2':  ['sm-arrow-1-2'],
-    '3':  ['sm-arrow-2-c', 'sm-arrow-c-3'],
-    '4':  ['sm-arrow-2-c', 'sm-arrow-c-4'],
-    '5':  ['sm-arrow-3-5', 'sm-arrow-4-5'],
-    'e3': ['sm-arrow-3-e3'],
-    'e4': ['sm-arrow-4-e4'],
+// Map state index + display_energy to Mermaid node name
+const STATE_NAMES = {
+    0: 'BOOT',
+    1: 'OBTAIN',
+    2: 'CAPDISPLAY',
+    3: 'NORMAL_PPS',
+    4: 'NORMAL_PDO',
+    5: 'MENU',
 };
+const ENERGY_NAMES = { 3: 'ENERGY_PPS', 4: 'ENERGY_PDO' };
 
-let lastStateKey = '';
+let lastActiveNode = null;
+
+function findMermaidNode(name) {
+    // Mermaid generates IDs like "mermaid-{ts}-state-{NAME}-{n}"
+    const svg = document.querySelector('.state-panel svg');
+    if (!svg) return null;
+    const nodes = svg.querySelectorAll('g[id*="-state-' + name + '-"]');
+    return nodes.length ? nodes[0] : null;
+}
 
 function updateStateDiagram(stateIdx, displayEnergy) {
-    // Compute effective state key: e3/e4 for energy sub-modes of state 3/4
-    let key = String(stateIdx);
-    if (displayEnergy && (stateIdx === 3 || stateIdx === 4)) {
-        key = 'e' + stateIdx;
+    let name = STATE_NAMES[stateIdx] || '';
+    if (displayEnergy && ENERGY_NAMES[stateIdx]) {
+        name = ENERGY_NAMES[stateIdx];
     }
-    if (key === lastStateKey) return;
-    lastStateKey = key;
+    if (!name) return;
 
-    // Clear all active classes
-    for (const id of SM_ALL_NODES) {
-        const node = document.getElementById(id);
-        if (node) node.classList.remove('active');
+    // Clear previous highlight
+    if (lastActiveNode) {
+        lastActiveNode.classList.remove('sm-active');
     }
-    document.querySelectorAll('.sm-arrow').forEach(el => {
-        el.classList.remove('active');
-        el.style.markerEnd = 'url(#sm-arrowhead)';
-    });
 
-    // Highlight active node
-    const activeNode = document.getElementById('sm-state-' + key);
-    if (activeNode) activeNode.classList.add('active');
-
-    // Highlight arrows leading to this state
-    const arrows = SM_ARROWS[key] || [];
-    for (const id of arrows) {
-        const el = document.getElementById(id);
-        if (el) {
-            el.classList.add('active');
-            el.style.markerEnd = 'url(#sm-arrowhead-active)';
-        }
+    const node = findMermaidNode(name);
+    if (node) {
+        node.classList.add('sm-active');
+        lastActiveNode = node;
     }
 }
 
