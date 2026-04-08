@@ -103,29 +103,43 @@ def setup_routes(app, sm, sim_ina=None):
     async def api_encoder(request):
         data = json.loads(request.body)
         delta = int(data.get("delta", 0))
-        # Inject encoder rotation directly into state machine
-        from drivers.button import EVENT_NONE
+        from app.state_machine import STATE_MENU, STATE_NORMAL_PDO, STATE_NORMAL_PPS
 
-        sm._handle_normal_inputs(EVENT_NONE, EVENT_NONE, EVENT_NONE, delta)
+        if sm.state in (STATE_NORMAL_PPS, STATE_NORMAL_PDO):
+            sm._handle_normal_inputs(0, 0, 0, delta)
+        elif sm.state == STATE_MENU:
+            sm._handle_menu_inputs(0, delta)
         return json.dumps({"ok": True})
 
     @app.route("/api/button/<name>", methods=["POST"])
     async def api_button(request, name):
         data = json.loads(request.body)
         event_str = data.get("event", "short")
+        from app.state_machine import (
+            STATE_CAPDISPLAY,
+            STATE_MENU,
+            STATE_NORMAL_PDO,
+            STATE_NORMAL_PPS,
+        )
         from drivers.button import EVENT_LONG, EVENT_SHORT
 
         event = EVENT_SHORT if event_str == "short" else EVENT_LONG
-
         none = 0  # EVENT_NONE
-        if name == "output":
-            sm._handle_normal_inputs(event, none, none, 0)
-        elif name == "select":
-            sm._handle_normal_inputs(none, event, none, 0)
-        elif name == "encoder":
-            sm._handle_normal_inputs(none, none, event, 0)
-        else:
+
+        if name not in ("output", "select", "encoder"):
             return json.dumps({"error": "unknown button"}), 400
+
+        # Dispatch based on current state, matching process_inputs() logic
+        out_ev = event if name == "output" else none
+        sel_ev = event if name == "select" else none
+        enc_ev = event if name == "encoder" else none
+
+        if sm.state in (STATE_NORMAL_PPS, STATE_NORMAL_PDO):
+            sm._handle_normal_inputs(out_ev, sel_ev, enc_ev, 0)
+        elif sm.state == STATE_MENU:
+            sm._handle_menu_inputs(sel_ev, 0)
+        elif sm.state == STATE_CAPDISPLAY and (out_ev or sel_ev or enc_ev):
+            sm._enter_normal()
 
         return json.dumps({"ok": True})
 
