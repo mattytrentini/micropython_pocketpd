@@ -253,7 +253,7 @@
         <!-- State Machine Diagram -->
         <div class="state-panel">
             <h2>State Machine</h2>
-            <svg id="sm-diagram" width="220" height="420" viewBox="0 0 220 420">
+            <svg id="sm-diagram" width="240" height="520" viewBox="0 0 240 520">
                 <defs>
                     <marker id="sm-arrowhead" markerWidth="8" markerHeight="6"
                             refX="8" refY="3" orient="auto">
@@ -267,70 +267,93 @@
 
                 <!-- BOOT -->
                 <g id="sm-state-0" class="sm-node">
-                    <rect x="60" y="10" width="100" height="40"/>
-                    <text x="110" y="27">BOOT</text>
-                    <text x="110" y="41" class="sm-label">splash 500ms</text>
+                    <rect x="70" y="10" width="100" height="40"/>
+                    <text x="120" y="27">BOOT</text>
+                    <text x="120" y="41" class="sm-label">splash 500ms</text>
                 </g>
-                <line id="sm-arrow-0-1" class="sm-arrow" x1="110" y1="50" x2="110" y2="70"/>
+                <line id="sm-arrow-0-1" class="sm-arrow" x1="120" y1="50" x2="120" y2="70"/>
 
                 <!-- OBTAIN -->
                 <g id="sm-state-1" class="sm-node">
-                    <rect x="60" y="70" width="100" height="40"/>
-                    <text x="110" y="87">OBTAIN</text>
-                    <text x="110" y="101" class="sm-label">read PDOs</text>
+                    <rect x="70" y="70" width="100" height="40"/>
+                    <text x="120" y="87">OBTAIN</text>
+                    <text x="120" y="101" class="sm-label">read PDOs</text>
                 </g>
-                <line id="sm-arrow-1-2" class="sm-arrow" x1="110" y1="110" x2="110" y2="130"/>
+                <line id="sm-arrow-1-2" class="sm-arrow" x1="120" y1="110" x2="120" y2="130"/>
 
                 <!-- CAPDISPLAY -->
                 <g id="sm-state-2" class="sm-node">
-                    <rect x="50" y="130" width="120" height="40"/>
-                    <text x="110" y="147">CAPDISPLAY</text>
-                    <text x="110" y="161" class="sm-label">show profiles 3s</text>
+                    <rect x="60" y="130" width="120" height="40"/>
+                    <text x="120" y="147">CAPDISPLAY</text>
+                    <text x="120" y="161" class="sm-label">show profiles 3s</text>
                 </g>
-                <line id="sm-arrow-2-c" class="sm-arrow" x1="110" y1="170" x2="110" y2="195"/>
+                <line id="sm-arrow-2-c" class="sm-arrow" x1="120" y1="170" x2="120" y2="195"/>
 
                 <!-- Choice diamond -->
-                <polygon class="sm-diamond" points="110,195 125,210 110,225 95,210"/>
+                <polygon class="sm-diamond" points="120,195 135,210 120,225 105,210"/>
 
                 <!-- Choice to NORMAL_PPS -->
-                <line id="sm-arrow-c-3" class="sm-arrow" x1="95" y1="210" x2="55" y2="250"/>
-                <text class="sm-choice-label" x="46" y="228">PPS</text>
+                <line id="sm-arrow-c-3" class="sm-arrow" x1="105" y1="210" x2="60" y2="245"/>
+                <text class="sm-choice-label" x="50" y="225">PPS</text>
 
                 <!-- Choice to NORMAL_PDO -->
-                <line id="sm-arrow-c-4" class="sm-arrow" x1="125" y1="210" x2="165" y2="250"/>
-                <text class="sm-choice-label" x="155" y="228">fixed</text>
+                <line id="sm-arrow-c-4" class="sm-arrow" x1="135" y1="210" x2="180" y2="245"/>
+                <text class="sm-choice-label" x="163" y="225">fixed</text>
 
                 <!-- NORMAL_PPS -->
                 <g id="sm-state-3" class="sm-node">
-                    <rect x="5" y="250" width="100" height="40"/>
-                    <text x="55" y="267">NORMAL_PPS</text>
-                    <text x="55" y="281" class="sm-label">fine V/I ctrl</text>
+                    <rect x="5" y="245" width="110" height="40"/>
+                    <text x="60" y="262">NORMAL_PPS</text>
+                    <text x="60" y="276" class="sm-label">fine V/I ctrl</text>
                 </g>
 
                 <!-- NORMAL_PDO -->
                 <g id="sm-state-4" class="sm-node">
-                    <rect x="115" y="250" width="100" height="40"/>
-                    <text x="165" y="267">NORMAL_PDO</text>
-                    <text x="165" y="281" class="sm-label">fixed profiles</text>
+                    <rect x="125" y="245" width="110" height="40"/>
+                    <text x="180" y="262">NORMAL_PDO</text>
+                    <text x="180" y="276" class="sm-label">fixed profiles</text>
                 </g>
 
-                <!-- NORMAL_PPS to MENU -->
-                <line id="sm-arrow-3-5" class="sm-arrow" x1="55" y1="290" x2="85" y2="340"/>
-                <!-- NORMAL_PDO to MENU -->
-                <line id="sm-arrow-4-5" class="sm-arrow" x1="165" y1="290" x2="135" y2="340"/>
-                <text class="sm-choice-label" x="28" y="320">enc long</text>
-                <text class="sm-choice-label" x="150" y="320">enc long</text>
+                <!-- NORMAL_PPS <-> ENERGY_PPS (bidirectional) -->
+                <line id="sm-arrow-3-e3" class="sm-arrow" x1="45" y1="285" x2="45" y2="335"/>
+                <line id="sm-arrow-e3-3" class="sm-arrow" x1="75" y1="335" x2="75" y2="285"/>
+                <text class="sm-choice-label" x="10" y="314">out long</text>
+
+                <!-- NORMAL_PDO <-> ENERGY_PDO (bidirectional) -->
+                <line id="sm-arrow-4-e4" class="sm-arrow" x1="165" y1="285" x2="165" y2="335"/>
+                <line id="sm-arrow-e4-4" class="sm-arrow" x1="195" y1="335" x2="195" y2="285"/>
+                <text class="sm-choice-label" x="200" y="314">out long</text>
+
+                <!-- ENERGY_PPS -->
+                <g id="sm-state-e3" class="sm-node">
+                    <rect x="5" y="335" width="110" height="40"/>
+                    <text x="60" y="352">ENERGY_PPS</text>
+                    <text x="60" y="366" class="sm-label">V A W Wh Ah</text>
+                </g>
+
+                <!-- ENERGY_PDO -->
+                <g id="sm-state-e4" class="sm-node">
+                    <rect x="125" y="335" width="110" height="40"/>
+                    <text x="180" y="352">ENERGY_PDO</text>
+                    <text x="180" y="366" class="sm-label">V A W Wh Ah</text>
+                </g>
+
+                <!-- Normal/Energy to MENU -->
+                <line id="sm-arrow-3-5" class="sm-arrow" x1="60" y1="375" x2="95" y2="425"/>
+                <line id="sm-arrow-4-5" class="sm-arrow" x1="180" y1="375" x2="145" y2="425"/>
+                <text class="sm-choice-label" x="38" y="408">enc long</text>
+                <text class="sm-choice-label" x="155" y="408">enc long</text>
 
                 <!-- MENU -->
                 <g id="sm-state-5" class="sm-node">
-                    <rect x="60" y="340" width="100" height="40"/>
-                    <text x="110" y="357">MENU</text>
-                    <text x="110" y="371" class="sm-label">select profile</text>
+                    <rect x="70" y="425" width="100" height="40"/>
+                    <text x="120" y="442">MENU</text>
+                    <text x="120" y="456" class="sm-label">select profile</text>
                 </g>
 
                 <!-- MENU back to choice (curved path up the side) -->
-                <path id="sm-arrow-5-c" class="sm-arrow" d="M 60,360 L 15,360 L 15,210 L 95,210" fill="none"/>
-                <text class="sm-choice-label" x="3" y="288">sel long</text>
+                <path id="sm-arrow-5-c" class="sm-arrow" d="M 70,445 L 18,445 L 18,210 L 105,210" fill="none"/>
+                <text class="sm-choice-label" x="3" y="330">sel long</text>
             </svg>
         </div>
     </div>

@@ -23,9 +23,18 @@ state "Normal Operation" as normal {
     state NORMAL_PPS : PPS mode\nFine V/I control\n(20mV / 50mA steps)
     state NORMAL_PDO : Fixed PDO mode\nPre-set voltage profiles
 
+    state ENERGY_PPS : PPS energy display\nV, A, W, Wh, Ah, time
+    state ENERGY_PDO : PDO energy display\nV, A, W, Wh, Ah, time
+
     state choice <<choice>>
     choice --> NORMAL_PPS : has PPS
     choice --> NORMAL_PDO : fixed only
+
+    NORMAL_PPS --> ENERGY_PPS : output\nlong press
+    ENERGY_PPS --> NORMAL_PPS : output\nlong press
+
+    NORMAL_PDO --> ENERGY_PDO : output\nlong press
+    ENERGY_PDO --> NORMAL_PDO : output\nlong press
 }
 
 state MENU : Profile selection\nEncoder navigates\nlist
@@ -38,10 +47,10 @@ OBTAIN --> CAPDISPLAY : PDOs parsed
 
 CAPDISPLAY --> choice : 3s timeout\nor any button
 
-CAPDISPLAY --> choice : any button press
-
 NORMAL_PPS --> MENU : encoder\nlong press
 NORMAL_PDO --> MENU : encoder\nlong press
+ENERGY_PPS --> MENU : encoder\nlong press
+ENERGY_PDO --> MENU : encoder\nlong press
 
 MENU --> choice : select\nlong press\n(apply profile)
 

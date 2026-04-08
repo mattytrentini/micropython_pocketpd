@@ -88,25 +88,36 @@ function connectStatusWs() {
 
 // --- State Machine Diagram ---
 
-// State index to arrow path: which arrows light up when entering each state
+// All node IDs that can be highlighted
+const SM_ALL_NODES = ['sm-state-0', 'sm-state-1', 'sm-state-2', 'sm-state-3',
+    'sm-state-4', 'sm-state-5', 'sm-state-e3', 'sm-state-e4'];
+
+// Which arrows to light for each effective state key
 const SM_ARROWS = {
-    0: [],                                         // BOOT (initial)
-    1: ['sm-arrow-0-1'],                           // OBTAIN (from BOOT)
-    2: ['sm-arrow-1-2'],                           // CAPDISPLAY (from OBTAIN)
-    3: ['sm-arrow-2-c', 'sm-arrow-c-3'],           // NORMAL_PPS (from CAPDISPLAY or MENU)
-    4: ['sm-arrow-2-c', 'sm-arrow-c-4'],           // NORMAL_PDO (from CAPDISPLAY or MENU)
-    5: [],                                         // MENU (from NORMAL_*)
+    '0':  [],
+    '1':  ['sm-arrow-0-1'],
+    '2':  ['sm-arrow-1-2'],
+    '3':  ['sm-arrow-2-c', 'sm-arrow-c-3'],
+    '4':  ['sm-arrow-2-c', 'sm-arrow-c-4'],
+    '5':  ['sm-arrow-3-5', 'sm-arrow-4-5'],
+    'e3': ['sm-arrow-3-e3'],
+    'e4': ['sm-arrow-4-e4'],
 };
 
-let lastState = -1;
+let lastStateKey = '';
 
-function updateStateDiagram(stateIdx) {
-    if (stateIdx === lastState) return;
-    lastState = stateIdx;
+function updateStateDiagram(stateIdx, displayEnergy) {
+    // Compute effective state key: e3/e4 for energy sub-modes of state 3/4
+    let key = String(stateIdx);
+    if (displayEnergy && (stateIdx === 3 || stateIdx === 4)) {
+        key = 'e' + stateIdx;
+    }
+    if (key === lastStateKey) return;
+    lastStateKey = key;
 
     // Clear all active classes
-    for (let i = 0; i <= 5; i++) {
-        const node = document.getElementById('sm-state-' + i);
+    for (const id of SM_ALL_NODES) {
+        const node = document.getElementById(id);
         if (node) node.classList.remove('active');
     }
     document.querySelectorAll('.sm-arrow').forEach(el => {
@@ -114,20 +125,12 @@ function updateStateDiagram(stateIdx) {
         el.style.markerEnd = 'url(#sm-arrowhead)';
     });
 
-    // Highlight active state
-    const activeNode = document.getElementById('sm-state-' + stateIdx);
+    // Highlight active node
+    const activeNode = document.getElementById('sm-state-' + key);
     if (activeNode) activeNode.classList.add('active');
 
     // Highlight arrows leading to this state
-    const arrows = SM_ARROWS[stateIdx] || [];
-
-    // For MENU, determine which NORMAL state we came from
-    if (stateIdx === 5) {
-        // Light up the arrow from whichever normal state is present
-        // (both shown dimly, JS can't know which — light both)
-        arrows.push('sm-arrow-3-5', 'sm-arrow-4-5');
-    }
-
+    const arrows = SM_ARROWS[key] || [];
     for (const id of arrows) {
         const el = document.getElementById(id);
         if (el) {
@@ -139,7 +142,7 @@ function updateStateDiagram(stateIdx) {
 
 function updateStatus(s) {
     // State machine diagram
-    updateStateDiagram(s.state);
+    updateStateDiagram(s.state, s.display_energy);
 
     // Voltage / Current / Power
     document.getElementById('val-voltage').textContent = (s.voltage_mv / 1000).toFixed(2);
