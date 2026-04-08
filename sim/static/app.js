@@ -86,7 +86,61 @@ function connectStatusWs() {
     };
 }
 
+// --- State Machine Diagram ---
+
+// State index to arrow path: which arrows light up when entering each state
+const SM_ARROWS = {
+    0: [],                                         // BOOT (initial)
+    1: ['sm-arrow-0-1'],                           // OBTAIN (from BOOT)
+    2: ['sm-arrow-1-2'],                           // CAPDISPLAY (from OBTAIN)
+    3: ['sm-arrow-2-c', 'sm-arrow-c-3'],           // NORMAL_PPS (from CAPDISPLAY or MENU)
+    4: ['sm-arrow-2-c', 'sm-arrow-c-4'],           // NORMAL_PDO (from CAPDISPLAY or MENU)
+    5: [],                                         // MENU (from NORMAL_*)
+};
+
+let lastState = -1;
+
+function updateStateDiagram(stateIdx) {
+    if (stateIdx === lastState) return;
+    lastState = stateIdx;
+
+    // Clear all active classes
+    for (let i = 0; i <= 5; i++) {
+        const node = document.getElementById('sm-state-' + i);
+        if (node) node.classList.remove('active');
+    }
+    document.querySelectorAll('.sm-arrow').forEach(el => {
+        el.classList.remove('active');
+        el.style.markerEnd = 'url(#sm-arrowhead)';
+    });
+
+    // Highlight active state
+    const activeNode = document.getElementById('sm-state-' + stateIdx);
+    if (activeNode) activeNode.classList.add('active');
+
+    // Highlight arrows leading to this state
+    const arrows = SM_ARROWS[stateIdx] || [];
+
+    // For MENU, determine which NORMAL state we came from
+    if (stateIdx === 5) {
+        // Light up the arrow from whichever normal state is present
+        // (both shown dimly, JS can't know which — light both)
+        arrows.push('sm-arrow-3-5', 'sm-arrow-4-5');
+    }
+
+    for (const id of arrows) {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.add('active');
+            el.style.markerEnd = 'url(#sm-arrowhead-active)';
+        }
+    }
+}
+
 function updateStatus(s) {
+    // State machine diagram
+    updateStateDiagram(s.state);
+
     // Voltage / Current / Power
     document.getElementById('val-voltage').textContent = (s.voltage_mv / 1000).toFixed(2);
     document.getElementById('val-current').textContent = (s.current_ma / 1000).toFixed(3);

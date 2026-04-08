@@ -111,6 +111,45 @@
         /* Energy section */
         .energy-section { margin-top: 12px; padding-top: 12px; border-top: 1px solid #333; }
         .energy-row { display: flex; justify-content: space-between; font-size: 0.85em; margin-bottom: 4px; }
+
+        /* State Machine Diagram */
+        .state-panel {
+            background: #16213e;
+            border-radius: 8px;
+            padding: 16px;
+            min-width: 220px;
+        }
+        .state-panel svg { display: block; margin: 0 auto; }
+        .sm-node rect {
+            fill: #0a0a1a;
+            stroke: #444;
+            stroke-width: 1.5;
+            rx: 6;
+            transition: fill 0.3s, stroke 0.3s, filter 0.3s;
+        }
+        .sm-node text {
+            fill: #888;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', monospace;
+            font-size: 11px;
+            text-anchor: middle;
+            transition: fill 0.3s;
+        }
+        .sm-node text.sm-label {
+            font-size: 9px;
+            fill: #555;
+        }
+        .sm-node.active rect {
+            fill: #0d2847;
+            stroke: #00d4ff;
+            stroke-width: 2;
+            filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.5));
+        }
+        .sm-node.active text { fill: #00d4ff; }
+        .sm-node.active text.sm-label { fill: #00a0cc; }
+        .sm-arrow { stroke: #444; stroke-width: 1.2; fill: none; marker-end: url(#sm-arrowhead); }
+        .sm-arrow.active { stroke: #00d4ff; filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.4)); }
+        .sm-diamond { fill: #0a0a1a; stroke: #444; stroke-width: 1.5; }
+        .sm-choice-label { fill: #555; font-family: monospace; font-size: 8px; }
     </style>
 </head>
 <body>
@@ -209,6 +248,90 @@
                 <button class="btn" onclick="apiPost('/api/button/encoder', {event: 'short'})">Enc Short</button>
                 <button class="btn" onclick="apiPost('/api/button/encoder', {event: 'long'})">Enc Long</button>
             </div>
+        </div>
+
+        <!-- State Machine Diagram -->
+        <div class="state-panel">
+            <h2>State Machine</h2>
+            <svg id="sm-diagram" width="220" height="420" viewBox="0 0 220 420">
+                <defs>
+                    <marker id="sm-arrowhead" markerWidth="8" markerHeight="6"
+                            refX="8" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#444"/>
+                    </marker>
+                    <marker id="sm-arrowhead-active" markerWidth="8" markerHeight="6"
+                            refX="8" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#00d4ff"/>
+                    </marker>
+                </defs>
+
+                <!-- BOOT -->
+                <g id="sm-state-0" class="sm-node">
+                    <rect x="60" y="10" width="100" height="40"/>
+                    <text x="110" y="27">BOOT</text>
+                    <text x="110" y="41" class="sm-label">splash 500ms</text>
+                </g>
+                <line id="sm-arrow-0-1" class="sm-arrow" x1="110" y1="50" x2="110" y2="70"/>
+
+                <!-- OBTAIN -->
+                <g id="sm-state-1" class="sm-node">
+                    <rect x="60" y="70" width="100" height="40"/>
+                    <text x="110" y="87">OBTAIN</text>
+                    <text x="110" y="101" class="sm-label">read PDOs</text>
+                </g>
+                <line id="sm-arrow-1-2" class="sm-arrow" x1="110" y1="110" x2="110" y2="130"/>
+
+                <!-- CAPDISPLAY -->
+                <g id="sm-state-2" class="sm-node">
+                    <rect x="50" y="130" width="120" height="40"/>
+                    <text x="110" y="147">CAPDISPLAY</text>
+                    <text x="110" y="161" class="sm-label">show profiles 3s</text>
+                </g>
+                <line id="sm-arrow-2-c" class="sm-arrow" x1="110" y1="170" x2="110" y2="195"/>
+
+                <!-- Choice diamond -->
+                <polygon class="sm-diamond" points="110,195 125,210 110,225 95,210"/>
+
+                <!-- Choice to NORMAL_PPS -->
+                <line id="sm-arrow-c-3" class="sm-arrow" x1="95" y1="210" x2="55" y2="250"/>
+                <text class="sm-choice-label" x="46" y="228">PPS</text>
+
+                <!-- Choice to NORMAL_PDO -->
+                <line id="sm-arrow-c-4" class="sm-arrow" x1="125" y1="210" x2="165" y2="250"/>
+                <text class="sm-choice-label" x="155" y="228">fixed</text>
+
+                <!-- NORMAL_PPS -->
+                <g id="sm-state-3" class="sm-node">
+                    <rect x="5" y="250" width="100" height="40"/>
+                    <text x="55" y="267">NORMAL_PPS</text>
+                    <text x="55" y="281" class="sm-label">fine V/I ctrl</text>
+                </g>
+
+                <!-- NORMAL_PDO -->
+                <g id="sm-state-4" class="sm-node">
+                    <rect x="115" y="250" width="100" height="40"/>
+                    <text x="165" y="267">NORMAL_PDO</text>
+                    <text x="165" y="281" class="sm-label">fixed profiles</text>
+                </g>
+
+                <!-- NORMAL_PPS to MENU -->
+                <line id="sm-arrow-3-5" class="sm-arrow" x1="55" y1="290" x2="85" y2="340"/>
+                <!-- NORMAL_PDO to MENU -->
+                <line id="sm-arrow-4-5" class="sm-arrow" x1="165" y1="290" x2="135" y2="340"/>
+                <text class="sm-choice-label" x="28" y="320">enc long</text>
+                <text class="sm-choice-label" x="150" y="320">enc long</text>
+
+                <!-- MENU -->
+                <g id="sm-state-5" class="sm-node">
+                    <rect x="60" y="340" width="100" height="40"/>
+                    <text x="110" y="357">MENU</text>
+                    <text x="110" y="371" class="sm-label">select profile</text>
+                </g>
+
+                <!-- MENU back to choice (curved path up the side) -->
+                <path id="sm-arrow-5-c" class="sm-arrow" d="M 60,360 L 15,360 L 15,210 L 95,210" fill="none"/>
+                <text class="sm-choice-label" x="3" y="288">sel long</text>
+            </svg>
         </div>
     </div>
 
