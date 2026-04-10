@@ -4,7 +4,7 @@
 I2C_ID = 0
 I2C_SDA = 4
 I2C_SCL = 5
-I2C_FREQ = 100_000  # AP33772 requires 100kHz
+I2C_FREQ = 400_000  # 400kHz — SSD1306 framebuffer write times out at 100kHz
 
 # I2C device addresses
 ADDR_AP33772 = 0x51
