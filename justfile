@@ -29,16 +29,26 @@ sim:
 
 # Deploy firmware to PocketPD device via mpremote
 deploy:
-    mpremote fs -r cp app/ :app/
-    mpremote fs -r cp drivers/ :drivers/
-    mpremote fs -r cp fonts/ :fonts/
-    mpremote fs mkdir :lib
-    mpremote fs mkdir :lib/nano_gui
-    mpremote fs cp lib/nano_gui/__init__.py :lib/nano_gui/__init__.py
-    mpremote fs cp lib/nano_gui/writer.py :lib/nano_gui/writer.py
-    mpremote fs cp lib/ssd1306.py :lib/ssd1306.py
-    mpremote fs cp boot.py main.py config.py :
+    #!/usr/bin/env bash
+    set -euo pipefail
+    echo "Deploying PocketPD firmware..."
+    # Create directories
+    for dir in app drivers fonts lib lib/nano_gui; do
+        mpremote mkdir ":$dir" 2>/dev/null || true
+    done
+    # Copy source files
+    for f in $(find app drivers fonts -name '*.py'); do
+        mpremote cp "$f" ":$f"
+    done
+    # Vendored libs
+    mpremote cp lib/nano_gui/__init__.py :lib/nano_gui/__init__.py
+    mpremote cp lib/nano_gui/writer.py :lib/nano_gui/writer.py
+    mpremote cp lib/ssd1306.py :lib/ssd1306.py
+    # Entry points and config
+    mpremote cp boot.py main.py config.py :
+    echo "Resetting device..."
     mpremote reset
+    echo "Deploy complete."
 
 # Generate state machine PNG from Mermaid definition
 diagram:
