@@ -40,7 +40,10 @@ def check_hardware(found):
     return present, missing
 
 
-# Run on import (MicroPython convention for boot.py)
+_boot_i2c = None
+_boot_present = {}
+_boot_missing = {}
+
 try:
     i2c, found = scan_i2c()
     present, missing = check_hardware(found)
@@ -54,13 +57,9 @@ try:
     if missing:
         print("WARNING: Running with incomplete hardware")
 
-    # Store for main.py
     _boot_i2c = i2c
     _boot_present = present
     _boot_missing = missing
 except Exception as e:
     print("Boot error:", e)
     sys.print_exception(e)
-    _boot_i2c = None
-    _boot_present = {}
-    _boot_missing = {}

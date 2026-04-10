@@ -12,19 +12,18 @@ from drivers.button import Button
 from drivers.encoder import Encoder
 from drivers.ina226 import INA226
 
-# Import boot results
-try:
-    from boot import _boot_i2c as i2c
-    from boot import _boot_present as present
-except ImportError:
-    i2c = None
-    present = {}
-
 
 def create_app():
     """Create and wire up all components."""
-    if i2c is None:
-        raise RuntimeError("No I2C bus — boot.py failed?")
+    # Create I2C bus (boot.py already ran a diagnostic scan, but we create
+    # a fresh instance here to avoid double-init issues)
+    i2c = machine.I2C(
+        config.I2C_ID,
+        sda=machine.Pin(config.I2C_SDA),
+        scl=machine.Pin(config.I2C_SCL),
+        freq=config.I2C_FREQ,
+    )
+    present = set(i2c.scan())
 
     # Display
     has_display = config.ADDR_SSD1306 in present
