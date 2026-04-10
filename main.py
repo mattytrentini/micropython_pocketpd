@@ -63,10 +63,10 @@ def create_app():
         long_press_min_ms=config.LONG_PRESS_MIN_MS,
     )
 
-    # Rotary encoder
+    # Rotary encoder (IRQ-based — takes GPIO numbers, not Pin objects)
     encoder = Encoder(
-        machine.Pin(config.PIN_ENC_CLK, machine.Pin.IN),
-        machine.Pin(config.PIN_ENC_DATA, machine.Pin.IN),
+        config.PIN_ENC_CLK,
+        config.PIN_ENC_DATA,
     )
 
     # Output enable pin (default off)

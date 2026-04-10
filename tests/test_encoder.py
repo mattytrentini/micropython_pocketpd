@@ -8,7 +8,7 @@ sys.path.insert(0, "/code/tests")
 import machine
 from testutil import assert_eq
 
-from drivers.encoder import Encoder
+from drivers.encoder import PollingEncoder as Encoder
 
 
 def _make_encoder(clk_val=1, data_val=1):

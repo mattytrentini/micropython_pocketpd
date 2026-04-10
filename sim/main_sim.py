@@ -47,7 +47,7 @@ from app.state_machine import StateMachine
 from drivers.ap33772 import AP33772
 from drivers.button import Button
 from drivers.display import Display
-from drivers.encoder import Encoder
+from drivers.encoder import PollingEncoder
 from drivers.ina226 import INA226
 from sim.devices import SimAP33772, SimINA226
 from sim.server import add_status_snapshot, setup_routes
@@ -120,7 +120,7 @@ def create_sim():
     btn_encoder = Button(machine.Pin(config.PIN_ENC_SW, machine.Pin.IN, value=1))
 
     # Encoder (mock pins)
-    encoder = Encoder(
+    encoder = PollingEncoder(
         machine.Pin(config.PIN_ENC_CLK, machine.Pin.IN, value=1),
         machine.Pin(config.PIN_ENC_DATA, machine.Pin.IN, value=1),
     )

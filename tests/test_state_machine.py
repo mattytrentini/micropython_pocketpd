@@ -24,7 +24,7 @@ from app.state_machine import (
 from drivers.ap33772 import AP33772, STATUS_READY
 from drivers.button import EVENT_NONE, Button
 from drivers.display import Display
-from drivers.encoder import Encoder
+from drivers.encoder import PollingEncoder as Encoder
 from drivers.ina226 import INA226
 
 

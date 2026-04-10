@@ -44,6 +44,8 @@ deploy:
     mpremote cp lib/nano_gui/__init__.py :lib/nano_gui/__init__.py
     mpremote cp lib/nano_gui/writer.py :lib/nano_gui/writer.py
     mpremote cp lib/ssd1306.py :lib/ssd1306.py
+    mpremote cp lib/rotary.py :lib/rotary.py
+    mpremote cp lib/rotary_irq_rp2.py :lib/rotary_irq_rp2.py
     # Entry points and config
     mpremote cp boot.py main.py config.py :
     echo "Resetting device..."
