@@ -27,6 +27,19 @@ format-check:
 sim:
     docker run --rm -p 8080:8080 -v $(pwd):/code -w /code micropython/unix micropython sim/main_sim.py
 
+# Deploy firmware to PocketPD device via mpremote
+deploy:
+    mpremote cp -r app/ :app/
+    mpremote cp -r drivers/ :drivers/
+    mpremote cp -r fonts/ :fonts/
+    mpremote mkdir :lib
+    mpremote mkdir :lib/nano_gui
+    mpremote cp lib/nano_gui/__init__.py :lib/nano_gui/__init__.py
+    mpremote cp lib/nano_gui/writer.py :lib/nano_gui/writer.py
+    mpremote cp lib/ssd1306.py :lib/ssd1306.py
+    mpremote cp boot.py main.py config.py :
+    mpremote reset
+
 # Generate state machine PNG from Mermaid definition
 diagram:
     docker run --rm -u "$(id -u):$(id -g)" -v $(pwd)/docs:/data minlag/mermaid-cli -i state_machine.mmd -o state_machine.png -t dark -b '#1a1a2e'
