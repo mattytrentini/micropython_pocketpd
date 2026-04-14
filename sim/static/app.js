@@ -1,5 +1,5 @@
 // PocketPD Simulator — Browser Client
-// Connects to /ws for OLED display streaming and /ws/status for state updates
+// Connects to /ws for OLED display streaming and /ws-status for state updates
 
 // --- OLED Display WebSocket (binary framebuf data) ---
 
@@ -7,10 +7,8 @@ const canvas = document.getElementById('oled-canvas');
 const ctx = canvas.getContext('2d');
 ctx.imageSmoothingEnabled = false;
 
-// Display dimensions (source)
 const OLED_W = 128;
 const OLED_H = 64;
-// Canvas is 3x scaled
 const SCALE = canvas.width / OLED_W;
 
 let displayWs = null;
@@ -27,17 +25,11 @@ function connectDisplayWs() {
     displayWs.onmessage = (event) => {
         const data = new Uint8Array(event.data);
         if (data.length < 8) return;
-
-        const msgType = data[0];
-        // 0x01 = full frame, 0x03 = init
-        if (msgType === 0x01) {
-            renderFrame(data);
-        }
+        if (data[0] === 0x01) renderFrame(data);
     };
 }
 
 function renderFrame(data) {
-    // Header: 8 bytes, then RGBA pixel data
     const header = data.slice(0, 8);
     const width = (header[2] << 8) | header[3];
     const height = (header[4] << 8) | header[5];
@@ -48,8 +40,6 @@ function renderFrame(data) {
     const imageData = ctx.createImageData(width, height);
     imageData.data.set(pixels);
 
-    // Draw at 1:1 then let CSS/canvas scale handle the rest
-    // Use a temp canvas for crisp scaling
     const tmp = document.createElement('canvas');
     tmp.width = width;
     tmp.height = height;
@@ -68,12 +58,12 @@ function connectStatusWs() {
     statusWs = new WebSocket(url);
 
     statusWs.onopen = () => {
-        document.getElementById('conn-indicator').className = 'status-indicator connected';
-        document.getElementById('conn-text').textContent = 'Connected';
+        document.getElementById('conn-dot').classList.add('connected');
+        document.getElementById('conn-text').textContent = 'CONNECTED';
     };
     statusWs.onclose = () => {
-        document.getElementById('conn-indicator').className = 'status-indicator disconnected';
-        document.getElementById('conn-text').textContent = 'Disconnected — reconnecting...';
+        document.getElementById('conn-dot').classList.remove('connected');
+        document.getElementById('conn-text').textContent = 'RECONNECTING';
         setTimeout(connectStatusWs, 2000);
     };
     statusWs.onerror = () => {};
@@ -88,7 +78,6 @@ function connectStatusWs() {
 
 // --- State Machine Diagram (Mermaid) ---
 
-// Map state index + display_energy to Mermaid node name
 const STATE_NAMES = {
     0: 'BOOT',
     1: 'OBTAIN',
@@ -102,8 +91,7 @@ const ENERGY_NAMES = { 3: 'ENERGY_PPS', 4: 'ENERGY_PDO' };
 let lastActiveNode = null;
 
 function findMermaidNode(name) {
-    // Mermaid generates IDs like "mermaid-{ts}-state-{NAME}-{n}"
-    const svg = document.querySelector('.state-panel svg');
+    const svg = document.querySelector('.state-area svg');
     if (!svg) return null;
     const nodes = svg.querySelectorAll('g[id*="-state-' + name + '-"]');
     return nodes.length ? nodes[0] : null;
@@ -116,7 +104,6 @@ function updateStateDiagram(stateIdx, displayEnergy) {
     }
     if (!name) return;
 
-    // Clear previous highlight
     if (lastActiveNode) {
         lastActiveNode.classList.remove('sm-active');
     }
@@ -168,13 +155,13 @@ function updateStatus(s) {
 
     // PDO list
     const pdoEl = document.getElementById('pdo-list');
-    if (pdoEl.children.length === 0 && (s.fixed_pdos.length || s.pps_pdos.length)) {
-        let html = '<h2>Source Profiles</h2>';
+    if (pdoEl.querySelectorAll('.pdo-item').length === 0 && (s.fixed_pdos.length || s.pps_pdos.length)) {
+        let html = '<div class="panel-label">Source Profiles</div>';
         for (const p of s.fixed_pdos) {
-            html += `<div class="pdo-item">${(p.voltage_mv/1000).toFixed(1)}V ${(p.max_current_ma/1000).toFixed(1)}A</div>`;
+            html += `<div class="pdo-item"><span>${(p.voltage_mv/1000).toFixed(1)}V</span><span>${(p.max_current_ma/1000).toFixed(1)}A</span></div>`;
         }
         for (const p of s.pps_pdos) {
-            html += `<div class="pdo-item pps">PPS ${(p.min_voltage_mv/1000).toFixed(1)}-${(p.max_voltage_mv/1000).toFixed(1)}V ${(p.max_current_ma/1000).toFixed(1)}A</div>`;
+            html += `<div class="pdo-item pps"><span>PPS ${(p.min_voltage_mv/1000).toFixed(1)}-${(p.max_voltage_mv/1000).toFixed(1)}V</span><span>${(p.max_current_ma/1000).toFixed(1)}A</span></div>`;
         }
         pdoEl.innerHTML = html;
     }
